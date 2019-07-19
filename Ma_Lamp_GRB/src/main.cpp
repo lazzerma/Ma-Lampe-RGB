@@ -6,6 +6,8 @@
 const uint8_t PIXELNUM = 24;         // this example assumes 4 strips, making it smaller will cause a failure
 const uint8_t PIXELPIN = 5;          // make sure to set this to the correct pin, ignored for Esp8266
 const uint8_t AnimationChannels = 1; // we only need one as all the pixels are animated at once
+int speed =5;
+bool reverseCount = true;
 
 #define colorSaturation 128
 
@@ -13,7 +15,6 @@ const uint8_t AnimationChannels = 1; // we only need one as all the pixels are a
 NeoPixelBus<NeoGrbFeature, NeoEsp32BitBang800KbpsMethod> strip(PIXELNUM, PIXELPIN);
 NeoPixelAnimator animations(AnimationChannels); // NeoPixel animation management object
 // one entry per pixel to match the animation timing manager
-
 
 struct MyAnimationState
 {
@@ -42,21 +43,31 @@ void setup()
 {
     Serial.begin(115200); //speed of serial
     SerialBT.begin("Val lampe");
-    pinMode(0,INPUT);
+    pinMode(0, INPUT);
     strip.Begin();
     rainbowFlag = true;
- 
 }
 
 void loop()
 {
+    if ( reverseCount){
+        speed++;
+        if (speed > 10){
+            reverseCount = false;
+        }
+    }
+    else{
+        speed--;
+          if (speed < 3 ){
+            reverseCount = true;
+        }
+}
     rgbManager();
 
     if (rainbowFlag)
     {
-        rainbow(10); //speed
+        rainbow(speed); //speed
     }
-
     while (!digitalRead(0))
     {
 
